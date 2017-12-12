@@ -17,7 +17,7 @@ tf.app.flags.DEFINE_integer(
     'num_epochs', 200,
     'Number of training epochs.')
 tf.app.flags.DEFINE_string(
-    'trunk', 'net_1',
+    'trunk', 'net_2',
     'Name of the network\'s trunk, one of "net_1", "net_2", "net_3", "net_4".')
 tf.app.flags.DEFINE_float(
     'decay_bn', 0.9,
@@ -39,10 +39,13 @@ tf.app.flags.DEFINE_integer(
     'random_seed_tf', 1,
     'Particular random initialization of model\'s parameters, 0 correspond to a random init without particular seed.')
 
-# save info
+# save/monitor info
 tf.app.flags.DEFINE_integer(
     'save_freq', 1,
     'Save model\'s parameters every n iterations.')
+tf.app.flags.DEFINE_integer(
+    'monitor_freq', 1,
+    'Monitor model\'s performance every n iterations.')
 
 
 # ============================================================================================================ #

@@ -5,7 +5,7 @@ import logging
 import datetime
 import string
 from tqdm import tqdm
-from architectures import net_1
+from architectures import net_1, net_2
 from config import FLAGS
 ALL_FLAGS = FLAGS.__flags
 
@@ -71,21 +71,26 @@ class CNN(object):
 
         if self.global_step.eval() == 0:
             graph_writer = tf.summary.FileWriter(os.path.join(FLAGS.summary_dir, 'graph'), sess.graph)
+            print('Epoch 0:')
             self.track_performance(sess, 0, train_eval_fn, train_eval_size, val_eval_fn, val_eval_size)
 
+        sess.run(self.iterator.initializer, {self.filenames: train_fn,
+                                             self.batch_size: FLAGS.train_batch_size,
+                                             self.num_epochs: FLAGS.monitor_freq})
         for epoch in range(FLAGS.ckpt + 1, FLAGS.ckpt + 1 + FLAGS.num_epochs):
-            sess.run(self.iterator.initializer, {self.filenames: train_fn,
-                                                 self.batch_size: FLAGS.train_batch_size,
-                                                 self.num_epochs: 1})
             for _ in tqdm(range(num_batches), desc='Epoch {:3d}'.format(epoch)):
                 sess.run(self.train_op, {self.is_train: True})
-                # print(sess.run(self.accuracy_op, {self.is_train: False}))
-                # print(sess.run(self.loss_op, {self.is_train: False}))
+                #print(sess.run(self.accuracy_op, {self.is_train: False}))
+                #print(sess.run(self.loss_op, {self.is_train: False}))
 
             # print(sess.run(self.accuracy_op, {self.is_train: False}))
             # print(sess.run(self.loss_op, {self.is_train: False}))
 
-            self.track_performance(sess, epoch, train_eval_fn, train_eval_size, val_eval_fn, val_eval_size)
+            if epoch % FLAGS.monitor_freq == 0:
+                self.track_performance(sess, epoch, train_eval_fn, train_eval_size, val_eval_fn, val_eval_size)
+                sess.run(self.iterator.initializer, {self.filenames: train_fn,
+                                                     self.batch_size: FLAGS.train_batch_size,
+                                                     self.num_epochs: FLAGS.monitor_freq})
             if epoch % FLAGS.save_freq == 0:
                 self.saver.save(sess, FLAGS.ckpt_dir, global_step=epoch)
 
@@ -95,12 +100,12 @@ class CNN(object):
         print("Train Loss: {:.3f}".format(train_loss))
 
         if val_eval_fn is not None:
-            test_accuracy, test_loss = self.eval(sess, val_eval_size, FLAGS.eval_batch_size, val_eval_fn)
-            print("Test Accuracy: {:.3f}".format(test_accuracy))
-            print("Test Loss: {:.3f}".format(test_loss))
+            val_accuracy, val_loss = self.eval(sess, val_eval_size, FLAGS.eval_batch_size, val_eval_fn)
+            print("Val Accuracy: {:.3f}".format(val_accuracy))
+            print("Val Loss: {:.3f}".format(val_loss))
 
-            self.logger.info('Epoch {}: train acc: {:.3f}, train loss: {:.3f}, test acc: {:.3f}, test loss: {:.3f}.'
-                             .format(epoch, train_accuracy, train_loss, test_accuracy, test_loss))
+            self.logger.info('Epoch {}: train acc: {:.3f}, train loss: {:.3f}, val acc: {:.3f}, val loss: {:.3f}.'
+                             .format(epoch, train_accuracy, train_loss, val_accuracy, val_loss))
 
     def eval(self, sess, num_images, batch_size, filenames, disable_bar=True):
         sess.run(self.iterator.initializer, {self.filenames: filenames,
@@ -227,8 +232,8 @@ def network_input(preprocess_mode='ohe'):
 def build_trunk(X, is_train):
     if FLAGS.trunk == 'net_1':
         y_logits = net_1(X, is_train)
-    # elif FLAGS.trunk == 'net_2':
-    #     y_logits = net_2(X, is_train)
+    elif FLAGS.trunk == 'net_2':
+         y_logits = net_2(X, is_train)
     # elif FLAGS.trunk == 'net_3':
     #     y_logits = net_3(X, is_train)
     # elif FLAGS.trunk == 'net_4':

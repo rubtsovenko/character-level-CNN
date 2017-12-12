@@ -9,13 +9,15 @@ def main():
 
         with tf.Session() as sess:
             model.load_or_init(sess)
-            train_data = ['data/tfrecords/seed_1/fold_1.tfrecords', 'data/tfrecords/seed_1/fold_2.tfrecords',
-                          'data/tfrecords/seed_1/fold_3.tfrecords', 'data/tfrecords/seed_1/fold_4.tfrecords']
+            train_fn = ['data/tfrecords/seed_1/fold_1.tfrecords', 'data/tfrecords/seed_1/fold_2.tfrecords',
+                        'data/tfrecords/seed_1/fold_3.tfrecords', 'data/tfrecords/seed_1/fold_4.tfrecords']
             # 5857+5856+5852+5849=23414
             train_size = 23414
+            train_eval_fn = ['data/tfrecords/seed_1/fold_1.tfrecords']
+            train_eval_size = 5857
             val_data = ['data/tfrecords/seed_1/fold_5.tfrecords']
             val_size = 5847
-            model.train(sess, train_data, train_size, val_data, val_size)
+            model.train(sess, train_fn, train_size, train_eval_fn, train_eval_size, val_data, val_size)
     elif FLAGS.train_mode == 'overfit_100':
         FLAGS.train_batch_size = 100
         FLAGS.eval_batch_size = 100
