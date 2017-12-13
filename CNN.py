@@ -12,6 +12,8 @@ ALL_FLAGS = FLAGS.__flags
 
 class CNN(object):
     def __init__(self):
+        tf.reset_default_graph()
+
         self.logger = get_logger(FLAGS.log_dir)
         now = datetime.datetime.now()
         self.logger.info('{} Model Created '.format(now.strftime("%Y-%m-%d %H:%M")).center(150, '*'))
@@ -221,7 +223,7 @@ def network_input(preprocess_mode='ohe'):
         dataset = dataset.shuffle(10000)
         dataset = dataset.repeat(num_epochs)
         dataset = dataset.batch(batch_size)
-        dataset = dataset.prefetch(100)
+        dataset = dataset.prefetch(1000)
 
         iterator = dataset.make_initializable_iterator()
         lines, labels = iterator.get_next()

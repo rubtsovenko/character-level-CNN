@@ -8,13 +8,16 @@ tf.app.flags.DEFINE_string(
     'train_mode', 'train_full',
     'One of train_full, overfit_100, overfit_1000')
 tf.app.flags.DEFINE_string(
+    'eval_mode', 'val',
+    'One of val, test, predict')
+tf.app.flags.DEFINE_string(
     'run_name', 'run_1',
     'Create a new folder for the experiment with a set name')
 tf.app.flags.DEFINE_integer(
     'ckpt', 0,
     'Restore model from the checkpoint, 0 - restore from the latest one or from scratch if no ckpts.')
 tf.app.flags.DEFINE_integer(
-    'num_epochs', 200,
+    'num_epochs', 350,
     'Number of training epochs.')
 tf.app.flags.DEFINE_string(
     'trunk', 'net_2',
@@ -23,12 +26,12 @@ tf.app.flags.DEFINE_float(
     'decay_bn', 0.9,
     'decay parameter for batch normalization layers')
 tf.app.flags.DEFINE_integer(
-    'num_threads', 8,
+    'num_threads', 1,
     'Number of threads to read and preprocess.')
 
 # batch settings
 tf.app.flags.DEFINE_integer(
-    'train_batch_size', 64,
+    'train_batch_size', 32,
     'Mini-batch size')
 tf.app.flags.DEFINE_integer(
     'eval_batch_size', 500,
@@ -75,7 +78,7 @@ tf.app.flags.DEFINE_float(
 
 # learning rate
 tf.app.flags.DEFINE_float(
-    'learning_rate', 0.001,
+    'learning_rate', 0.0001,
     'Initial learning rate.')
 
 # weight decay regularization
